@@ -1,0 +1,264 @@
+﻿<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="utf-8" />
+    <title>DTN Configuration Tool</title>
+    <link href="main.css" rel="stylesheet" type="text/css" />
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <link href="http://fonts.googleapis.com/css?family=Nobile" rel="stylesheet" type="text/css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script> <!--google's jquery-->
+</head>
+<body id="body">
+
+    <header class="sticky">
+        <p id="Title">
+            DTN Configuration Tool
+        </p>
+        <div style="padding-top: 12px">
+            <button class="button" onclick="reset();">Clear</button>
+            <button class="button" onclick="save();">Save</button>
+            <button class="button" onclick="load();">Load</button>
+            <button class="button" onclick="toggleJSONImportMenuOn();">Load External JSON File</button>
+            <button href="#" id="Generate JSON Files" class="button" download="dtn.json" onclick="toggleJSONMenuOn();">Generate JSON File</button>
+            <button id="view" class="button" onclick="toggleDropdowns('view');" onmouseover="toggleViewMenu(true);">View</button>
+            <button id="window" class="button" onclick="toggleDropdowns('window');" onmouseover="toggleWindowMenu(true);">Window</button>
+            <button id="help" class="button" onclick="toggleDropdowns('help');" onmouseover="toggleHelpMenu(true);">Help</button>
+        </div>
+        <div id="selectedName"></div>
+        <div id="footer"> © NASA JPL</div>
+    </header>
+    <div id="threeDCanvas">
+        <!--THREE.JS SCRIPTS-->
+        <script src="scripts/threejs/three.min.js"></script>
+        <script src="scripts/threejs/OrbitControls.js"></script>
+        <script src="scripts/threejs/jszip.min.js"></script>
+        <script src="scripts/threejs/LoaderUtils.js"></script>
+        <script src="scripts/threejs/GLTFLoader.js"></script>
+
+        <script src="https://fastcdn.org/FileSaver.js/1.1.20151003/FileSaver.min.js"></script>
+        <script src="scripts/useful_functions.js"></script>
+        <script src="scripts/initialization.js"></script>
+        <script src="scripts/link_implementation.js"></script>
+        <script src="scripts/3Dapp.js"></script>
+    </div>
+
+    <div id="view-menu">
+        <button class="menuButton" onclick="setViewState(1);">Nodes Only</button>
+        <button class="menuButton" onclick="setViewState(2);">Hosts Only</button>
+        <button class="menuButton" onclick="setViewState(0);">Everything</button>
+        <button id="labels" class="menuButton" onclick="toggleLabels();">Labels ✓</button>
+        <button id="hostNodes" class="menuButton" onclick="setViewState(3);" style="display: none">This Host</button>
+    </div>
+    <div id="help-menu">
+        <button class="menuButton" onclick="showInstructions(true);">Instructions</button>
+        <button class="menuButton" onclick="showNotes(true);">Notes</button>
+    </div>
+    <div id="window-menu">
+        <button class="menuButton" onclick="showHierarchy(true);">Hierarchy</button>
+    </div>
+    <ul id="helpInfo" style="display: none">
+        <li>‣ Orbit: Left click and drag.</li>
+        <li>‣ Pan: Right click and drag.</li>
+        <li>‣ Placing Objects: Hold cursor at desired location and press the 'A' (Add) key. </li>
+        <li>‣ Moving Objects: Select a node with right click and drag the arrows with left click. </li>
+        <li>‣ Moving Objects: Hold 'G' (Grab) or 'M' (Move) and left click and drag. </li>
+        <li>‣ Rotating Hosts: Select a host and press 'R' to rotate it 90 degrees. </li>
+        <!--<li>Moving Objects: Hold 'Z' and click and drag to move along Z-axis. </li>-->
+        <li>‣ Right click on a node or link to bring up the editor.</li>
+        <li>‣ Press 'H' when a node is selected to hide it. </li>
+        <li>‣ Press 'SHIFT' + 'H' to unhide all nodes. </li>
+        <li>‣ Press 'SHIFT' + 'Z' to reset the Z-coordinates of an object. </li>
+        <li>‣ Linking Nodes: Hold 'shift' and click and drag to another node. </li>
+        <li>‣ Deleting Objects: Open the node editor and click 'Delete'</li>
+        <li>‣ Duplicating Objects: Select a node or host and then press 'SHIFT' and 'D' to duplicate the object.</li>
+        <li>‣ Clear: Clears the current network.</li>
+        <li>‣ Save: Saves the current network. This overwrites previous save data.</li>
+        <li>‣ Load: Loads in the saved network if it exists.</li>
+        <li>‣ Load External JSON File: Use this to import network data from a JSON file. </li>
+        <li>‣ Generate JSON File: Use this to dowload the JSON file corresponding to the current network.</li>
+        <li>‣ Host Editor Mode: Select a host and an option to view "This Host" in the View menu will appear. The selected host's label will appear in the top left. You can add and delete labeled nodes in this mode.</li>
+    </ul>
+    <ul id="helpNotes" style="display: none">
+        <li>‣ When using Firefox, use version above 49.0 to avoid problem where Instruction and Notes panels do not hide. </li>
+        <li>‣ All nodes and hosts need unique labels.</li>
+        <li>‣ To significantly reduce loading time, disable labels before loading a model.</li>
+    </ul>
+    <div id="hierarchyMenu">
+        HIERARCHY <br>
+        <ul id="hierarchy"></ul>
+    </div>
+    <div id="node-menu" class="node-menu">
+        <b>NODE EDITOR</b> <br><br>
+        <form>
+            <b>Node Label:</b> <br>
+            <input id="nodeLabel" type="text" name="nodeLabel" value="" onclick="setInForm(true)"><br>
+            <b>Node Type:</b><br>
+            <input id="nodeType" type="radio" name="nodeType" value="ion" onclick="toggleIONorDTN();" checked> ION
+            <input id="DTN nodeType" type="radio" name="nodeType" value="dtn" onclick="toggleIONorDTN();"> DTN <br>
+            <div><b id="nodeLabelInnerText">Node ID:</b></div>
+            <input id="endpointID" type="text" name="nodeID" value="" onclick="setInForm(true)"><br>
+            <b>Protocols:</b><br>
+            <input id="ltp" type="checkbox" value="ltp">LTP
+            <input id="udp" type="checkbox" value="udp">UDP
+            <input id="tcp" type="checkbox" value="tcp">TCP
+            <input id="stcp" type="checkbox" value="stcp">STCP <br>
+            Other: <input id="otherProtocol" type="text" value="" onclick="setInForm(true)" style="width:100px"><br>
+            <b>Services:</b><br>
+            <input id="cfdp" type="checkbox" value="cfdp">CFDP
+            <input id="ams" type="checkbox" value="ams">AMS <br />
+            Other: <input id="otherService" type="text" value="" onclick="setInForm(true)" style="width:100px"><br>
+            <b>Node Description:</b> <br>
+            <input id="nodeDesc" type="text" name="nodeDesc" placeholder="Add description here ..." value="" onclick="setInForm(true)"><br>
+            <b>Color:</b> <br>
+            <select id="Color" name="Color">
+                <option value="White" selected="selected">White</option>
+                <option value="Green">Green</option>
+                <option value="Red">Red</option>
+                <option value="Blue">Blue</option>
+                <option value="Orange">Orange</option>
+                <option value="Yellow">Yellow</option>
+                <option value="Purple">Purple</option>
+            </select><br>
+            <b>Position:</b> <br>
+            X: <input id="nodeX" type="text" value="" onclick="setInForm(true)" style="width:50px">
+            Y: <input id="nodeY" type="text" value="" onclick="setInForm(true)" style="width:50px">
+            Z: <input id="nodeZ" type="text" value="" onclick="setInForm(true)" style="width:50px"><br><br>
+            <button class="button" onclick="return nodeSave();">Save</button>
+            <button class="button" onclick="return removeNode();">Delete</button>
+        </form>
+    </div>
+    <div id="host-menu" class="node-menu">
+        <b>HOST EDITOR</b> <br><br>
+        <form>
+            <b>Host Label:</b> <br>
+            <input id="hostLabel" type="text" name="hostLabel" value="" onclick="setInForm(true)"><br>
+            <b>IP Addresses:</b><br>
+            <input id="IP" type="text" name="IP" value="" placeholder="..., ..., etc..." onclick="setInForm(true)"><br>
+            <b>Platform:</b><br>
+            <input id="Windows" name="platform" type="radio" value="windows">Windows <br>
+            <input id="Unix" name="platform" type="radio" value="unix">Unix <br>
+            <input id="Mac" name="platform" type="radio" value="mac">Mac <br>
+            <input id="otherPlatform" name="platform" type="radio" value="mac">Other:
+            <input id="otherPlatformText" type="text" value="" onclick="setInForm(true)" style="width:100px"><br>
+            <b>Nodes:</b><br>
+            <input id="numOfNodes" type="text" value="0" onclick="setInForm(true)" />
+            <ul id="nodeList" display="none"></ul>
+            <b>Host Description:</b><br>
+            <input id="hostDesc" type="text" name="hostDesc" placeholder="Add description here ..." value="" onclick="setInForm(true)"><br>
+            <b>Color:</b><br>
+            <select id="hostColor" name="hostColor">
+                <option value="Black" selected="selected">Black</option>
+                <option value="Green">Green</option>
+                <option value="Red">Red</option>
+                <option value="Blue">Blue</option>
+                <option value="Orange">Orange</option>
+                <option value="Yellow">Yellow</option>
+                <option value="Purple">Purple</option>
+            </select><br>
+            <b>Position:</b> <br>
+            X: <input id="hostX" type="text" value="" onclick="setInForm(true)" style="width:50px">
+            Y: <input id="hostY" type="text" value="" onclick="setInForm(true)" style="width:50px">
+            Z: <input id="hostZ" type="text" value="" onclick="setInForm(true)" style="width:50px"><br><br>
+            <button class="button" onclick="return hostSave();">Save</button>
+            <button class="button" onclick="return removeHost();">Delete</button>
+        </form>
+    </div>
+    <div id="JSON-menu" class="JSON-menu">
+        <form>
+            JSON EXPORT MENU<br><br>
+            File Name<input id="filename" type="text" value="" onclick="setInForm(true)"><br><br>
+            Net Name<input id="netName" type="text" value="" onclick="setInForm(true)"><br><br>
+            Net Description<input id="netDesc" type="text" value="" onclick="setInForm(true)"><br><br>
+            Include Visualization Data<input id="visualizationData" type="checkbox" checked/><br><br>
+            <button class="button" onclick="return generateJSONFiles();">Download</button>
+            <button class="button" onclick="return toggleJSONMenuOff();">Close</button>
+        </form>
+    </div>
+    <div id="JSON-import-menu" class="JSON-import-menu">
+        <form>
+            JSON IMPORT MENU<br><br>
+            <input type="file" id="myFile"><br><br>
+            Merge With Current Scene<input id="merge" type="checkbox" /><br><br>
+            <button class="button" onclick="return importJSONFile();">Load</button>
+            <button class="button" onclick="return toggleJSONImportMenuOff();">Close</button>
+        </form>
+    </div>
+    <div id="link-menu" class="link-menu">
+        <form id="menu-column-middle">
+            <b>LINK EDITOR</b><br><br>
+            <b id="symmetricTitle">Symmetric</b><input id="symmetric" type="checkbox" onchange="toggleSymmetric();"><br>
+            <b>Color:</b>
+            <select id="Link Color" name="Color">
+                <option value="Blue">Blue</option>
+                <option value="Green">Green</option>
+                <option value="Red">Red</option>
+                <option value="Orange">Orange</option>
+                <option value="Yellow">Yellow</option>
+                <option value="Purple">Purple</option>
+            </select><br><br>
+        </form>
+        <form id="menu-column-left">
+            <div><b id="Node 1 to 2 Column">Node 1 to 2</b></div><br>
+            <b>Link Exists</b><input id="Link Exists12" type="checkbox" onchange="toggleLink12();"><br>
+            <div id="Attributes12">
+                <b>Max Rate (bps):</b><br>
+                <input id="Max Rate12" type="text" name="Max Rate" value="" onclick="setInForm(true)"><br>
+                <!--Start Time:<br>
+                <input id="startTime12" type="text" value="" placeholder="YYYY/MM/DD-hh:mm:ss or +X"><br>
+                End Time:<br>
+                <input id="endTime12" type="text" value="" placeholder="YYYY/MM/DD-hh:mm:ss or +X"><br>-->
+                <b>BP Layer</b><br>
+                <input id="TCP12" type="radio" name="bpLayer" value="TCP" checked> TCP <br>
+                <input id="LTP12" type="radio" name="bpLayer" value="LTP"> LTP
+                <input id="LTP Layer12" type="text" placeholder="UDP/AOS/TC/DCCP/etc" value="" onclick="setInForm(true)"><br>
+                <input id="UDP12" type="radio" name="bpLayer" value="UDP" checked> UDP <br>
+                <input id="STCP12" type="radio" name="bpLayer" value="STCP" checked> STCP <br>
+                <input id="DCCP12" type="radio" name="bpLayer" value="DCCP" checked> DCCP <br>
+                <input id="otherBPLayer12" type="radio" name="bpLayer" value="">
+                Other: <input id="otherBPLayerText12" type="text" onclick="setInForm(true)" style="width:125px"> <br>
+
+                <b>Link Description:</b><br>
+                <input id="Description12" type="text" name="Description" value="" placeholder="Add description here ..." onclick="setInForm(true)"><br><br>
+            </div>
+        </form>
+        <form id="menu-column-right">
+            <div><b id="Node 2 to 1 Column">Node 2 to 1</b></div><br>
+            <b>Link Exists</b><input id="Link Exists21" type="checkbox" onchange="toggleLink21();"><br>
+            <div id="Attributes21">
+                <b>Max Rate (bps):</b><br>
+                <input id="Max Rate21" type="text" name="Max Rate" value="" onclick="setInForm(true)"><br>
+                <!--Start Time:<br>
+                <input id="startTime21" type="text" value="" placeholder="YYYY/MM/DD-hh:mm:ss or +X"><br>
+                End Time:<br>
+                <input id="endTime21" type="text" value="" placeholder="YYYY/MM/DD-hh:mm:ss or +X"><br>-->
+                <b>BP Layer</b><br>
+                <input id="TCP21" type="radio" name="bpLayer" value="TCP" checked> TCP <br>
+                <input id="LTP21" type="radio" name="bpLayer" value="LTP"> LTP
+                <input id="LTP Layer21" type="text" placeholder="UDP/AOS/TC/DCCP/etc" value="" onclick="setInForm(true)"><br>
+                <input id="UDP21" type="radio" name="bpLayer" value="UDP" checked> UDP <br>
+                <input id="STCP21" type="radio" name="bpLayer" value="STCP" checked> STCP <br>
+                <input id="DCCP21" type="radio" name="bpLayer" value="DCCP" checked> DCCP <br>
+                <input id="otherBPLayer21" type="radio" name="bpLayer" value="">
+                Other: <input id="otherBPLayerText21" type="text" onclick="setInForm(true)" style="width:125px"> <br>
+                <b>Link Description:</b><br>
+                <input id="Description21" type="text" name="Description" value="" placeholder="Add description here ..." onclick="setInForm(true)"><br><br>
+            </div>
+        </form>
+        <form id="link-buttons">
+            <button class="button" onclick="return linkSave();">Save</button>
+            <button class="button" onclick="return removeLink(selectedLink);">Delete Link</button>
+        </form>
+    </div>
+    <div id="add-menu" class="add-menu">
+        <form>
+            ADD MENU<br><br>
+            <button id="placeNodeDisable" class="button" type="button" onclick="return placeNode();">Node</button>
+            <button id="placeHostDisable" class="button" type="button" onclick="return placeHost();">Host</button>
+        </form>
+    </div>
+    <script src="scripts/context_menu_manipulations.js"></script>
+    <script src="scripts/jsonFileExporter.js"></script>
+
+</body>
+
+</html>
