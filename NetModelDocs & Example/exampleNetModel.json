@@ -1,0 +1,249 @@
+{
+    "netModelName": "RoverRelayNetwork",
+    "netModelDesc": "example Mars relay",
+    "netNodes": {
+        "Mars Relay": {
+            "nodeDesc": "Relay Orbiter Telecom ",
+            "color": "Blue",
+            "nodeType": "ion",
+            "endpointID": "11",
+            "protocols": [
+                "ltp",
+                "tcp",
+                "udp"
+            ],
+            "services": [
+                "cfdp"
+            ],
+            "nodeHost": "Relay S/C",
+            "positionX": 0.9608400162404596,
+            "positionY": 13.1173838388303,
+            "positionZ": -8.932737164466179
+        },
+        "Rover": {
+            "nodeDesc": "Sample rover",
+            "color": "Yellow",
+            "nodeType": "ion",
+            "endpointID": "123",
+            "protocols": [
+                "prox1"
+            ],
+            "services": [
+                "cfdp"
+            ],
+            "nodeHost": "Rover",
+            "positionX": 10.3228601693256,
+            "positionY": 3.333,
+            "positionZ": 0.43690753412941596
+        },
+        "DSN": {
+            "nodeDesc": "DSN station",
+            "color": "Green",
+            "nodeType": "ion",
+            "endpointID": "44",
+            "protocols": [
+                "ltp",
+                "stcp",
+                "tcp",
+                "udp"
+            ],
+            "services": [
+                "cfdp",
+                "ams"
+            ],
+            "nodeHost": "DSOC",
+            "positionX": -9.740968837915029,
+            "positionY": 3.333,
+            "positionZ": 0.6027161992488965
+        },
+        "Rover SCT": {
+            "nodeDesc": "Rover Ops",
+            "color": "Yellow",
+            "nodeType": "ion",
+            "endpointID": "124",
+            "protocols": [
+                "tcp",
+                "udp"
+            ],
+            "services": [
+                "cfdp"
+            ],
+            "nodeHost": "Rover Ops",
+            "positionX": -16.388504418641716,
+            "positionY": 3.333,
+            "positionZ": 14.458746135017314
+        },
+        "Relay SCT": {
+            "nodeDesc": "Relay SCT",
+            "color": "Blue",
+            "nodeType": "ion",
+            "endpointID": "12",
+            "protocols": [
+                "tcp",
+                "udp"
+            ],
+            "services": [
+                "cfdp"
+            ],
+            "nodeHost": "Relay Ops",
+            "positionX": 0.15511230709773915,
+            "positionY": 3.333,
+            "positionZ": 18.927597372280133
+        }
+    },
+    "netHops": {
+        "Mars Relay-DSN": {
+            "color": "Purple",
+            "fromNode": "Mars Relay",
+            "toNode": "DSN",
+            "bpLayer": "ltp",
+            "ltpLayer": "aos",
+            "exists12": true,
+            "symmetric": false,
+            "maxRate": "4000000",
+            "hopDesc": "downlink"
+        },
+        "DSN-Mars Relay": {
+            "color": "Purple",
+            "fromNode": "DSN",
+            "toNode": "Mars Relay",
+            "bpLayer": "ltp",
+            "ltpLayer": "aos",
+            "exists21": true,
+            "symmetric": false,
+            "maxRate": "1000000",
+            "hopDesc": "uplink"
+        },
+        "Mars Relay-Rover": {
+            "color": "Yellow",
+            "fromNode": "Mars Relay",
+            "toNode": "Rover",
+            "bpLayer": "prox-1",
+            "ltpLayer": "",
+            "exists12": true,
+            "symmetric": false,
+            "maxRate": "256000",
+            "hopDesc": "UHF link"
+        },
+        "Rover-Mars Relay": {
+            "color": "Yellow",
+            "fromNode": "Rover",
+            "toNode": "Mars Relay",
+            "bpLayer": "prox-1",
+            "ltpLayer": "",
+            "exists21": true,
+            "symmetric": false,
+            "maxRate": "256000",
+            "hopDesc": "UHF link"
+        },
+        "Relay SCT-DSN": {
+            "color": "Red",
+            "fromNode": "Relay SCT",
+            "toNode": "DSN",
+            "bpLayer": "tcp",
+            "ltpLayer": "",
+            "symmetric": true,
+            "maxRate": "10000000",
+            "hopDesc": "ethernet"
+        },
+        "Rover SCT-DSN": {
+            "color": "Red",
+            "fromNode": "Rover SCT",
+            "toNode": "DSN",
+            "bpLayer": "tcp",
+            "ltpLayer": "",
+            "symmetric": true,
+            "maxRate": "10000000",
+            "hopDesc": "ethernet"
+        }
+    },
+    "netHosts": {
+        "Relay S/C": {
+            "hostDesc": "Relay telecom",
+            "color": "Blue",
+            "platform": "unix",
+            "ipAddrs": [
+                ""
+            ],
+            "hostNodes": [
+                "Mars Relay"
+            ],
+            "positionX": 0.9608400162404596,
+            "positionY": 10.6173838388303,
+            "positionZ": -8.932737164466179,
+            "rotationY": 0
+        },
+        "DSOC": {
+            "hostDesc": "DSN Node",
+            "color": "Green",
+            "platform": "unix",
+            "ipAddrs": [
+                "192.168.1.100"
+            ],
+            "hostNodes": [
+                "DSN"
+            ],
+            "positionX": -9.740968837915029,
+            "positionY": 0.833,
+            "positionZ": 0.6027161992488965,
+            "rotationY": 0
+        },
+        "Rover": {
+            "hostDesc": "Rover UHF",
+            "color": "Yellow",
+            "platform": "unix",
+            "ipAddrs": [
+                ""
+            ],
+            "hostNodes": [
+                "Rover"
+            ],
+            "positionX": 10.3228601693256,
+            "positionY": 0.833,
+            "positionZ": 0.43690753412941596,
+            "rotationY": 0
+        },
+        "Rover Ops": {
+            "hostDesc": "Rover ops server",
+            "color": "Black",
+            "platform": "unix",
+            "ipAddrs": [
+                "192.168.1.124"
+            ],
+            "hostNodes": [
+                "Rover SCT"
+            ],
+            "positionX": -16.388504418641716,
+            "positionY": 0.833,
+            "positionZ": 14.458746135017314,
+            "rotationY": 0
+        },
+        "Relay Ops": {
+            "hostDesc": "Relay ops server",
+            "color": "Blue",
+            "platform": "unix",
+            "ipAddrs": [
+                "192.168.1.300"
+            ],
+            "hostNodes": [
+                "Relay SCT"
+            ],
+            "positionX": 0.15511230709773915,
+            "positionY": 0.833,
+            "positionZ": 18.927597372280133,
+            "rotationY": 0
+        }
+    },
+    "localViewPos": {
+        "0": {},
+        "Relay S/C": {},
+        "DSOC": {},
+        "Rover": {},
+        "Rover Ops": {},
+        "Relay Ops": {},
+        "Odyssey": {},
+        "host platform": {},
+        "": {}
+    },
+    "localHostLinks": {}
+}
