@@ -102,7 +102,7 @@ function init() {
     controls = new THREE.OrbitControls(camera, renderer.domElement);
 
     // Add a small ball to act as a cursor for node placement (should approximately follow cursor)
-    var geometry = new THREE.SphereGeometry(.2, 6, 6);
+    var geometry = new THREE.SphereGeometry(.4, 6, 6);
     var material = new THREE.MeshBasicMaterial({ color: "rgb(255, 0, 0)" });
     pointer = new THREE.Mesh(geometry, material);
     pointer.name = "pointer";
@@ -645,11 +645,8 @@ function populateScene(json) {
         }
         if (!alreadyUpdatedLink) {
             // if no link already made for this connection, make one
-            var mat = new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 1 });
+            var mat = new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 3 });
             var geo = new THREE.Geometry();
-            if (!linkData["fromNode"] && !linkData["toNode"]) {
-                continue;
-            }
             geo.vertices.push(getObjectFromLabel(linkData["fromNode"]).object.position, getObjectFromLabel(linkData["toNode"]).object.position);
             var linkMesh = new THREE.Line(geo, mat);
             linkMesh.name = "Link";

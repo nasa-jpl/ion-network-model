@@ -6,15 +6,16 @@ var jsonImportMenu = document.getElementById("JSON-import-menu");
 var jsonImportMenuState = 0;
 var activeClassName = "JSON-menu--active";
 var activeImportClassName = "JSON-import-menu--active";
+var includeVis = false;
 
-function createJSON(includeVis = false) {
+function createJSON(includeVis) {
     var node = null;
     var myJSONObj = new Object(); //JSON library obj
     var netNodes = new Object();
-    var netName = document.getElementById("netName").value;
-    var netDesc = document.getElementById("netDesc").value;
-    myJSONObj["netName"] = netName;
-    myJSONObj["netDesc"] = netDesc;
+    var netName = document.getElementById("netModelName").value;
+    var netDesc = document.getElementById("netModelDesc").value;
+    myJSONObj["netModelName"] = netName;
+    myJSONObj["netModelDesc"] = netDesc;
     var usedLabels = [];
     var emptyLabels = 0;
     var sameNameAlert = false;

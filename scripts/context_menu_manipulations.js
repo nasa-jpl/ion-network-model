@@ -136,7 +136,7 @@ function selectNode(node) {
     }
 }
 
-//called from hierarchy; sets selectedNode and toggles node manu on
+//called from hierarchy; sets selectedNode and toggles node menu on
 function selectNodeFromHierarchy(nodeLabel, event) { 
     event.cancelBubble = true;
     if (event.stopPropagation) event.stopPropagation();
@@ -206,6 +206,7 @@ function updateEditorNodes(host) {
             document.getElementById("nodeList").style.display = "block";
             var entry = document.createElement('input');
             entry.setAttribute("type", "text");
+            entry.setAttribute("spellCheck", "false");
             entry.setAttribute("value", "");
             entry.setAttribute("onclick", "setInForm(true);");
             entry.setAttribute("tabindex", "1");
@@ -393,6 +394,7 @@ function switchEditorNodes(host) {
             document.getElementById("nodeList").style.display = "block";
             var entry = document.createElement('input');
             entry.setAttribute("type", "text");
+            entry.setAttribute("spellCheck", "false");
             entry.setAttribute("value", "");
             entry.setAttribute("onclick", "setInForm(true)");
             entry.setAttribute("tabindex", "1");
@@ -629,11 +631,11 @@ function toggleNodeMenuOn() {
         document.getElementById("endpointID").value = selectedNode.endpointID;
         document.getElementById("nodeLabel").value = selectedNode.nodeLabel;
 
-        document.getElementById("ltp").checked = selectedNode.ltp;
-        document.getElementById("udp").checked = selectedNode.udp;
-        document.getElementById("tcp").checked = selectedNode.tcp;
-        document.getElementById("stcp").checked = selectedNode.stcp;
-        document.getElementById("otherProtocol").value = selectedNode.otherProtocol;
+        // document.getElementById("ltp").checked = selectedNode.ltp;
+        // document.getElementById("udp").checked = selectedNode.udp;
+        // document.getElementById("tcp").checked = selectedNode.tcp;
+        // document.getElementById("stcp").checked = selectedNode.stcp;
+        // document.getElementById("otherProtocol").value = selectedNode.otherProtocol;
 
         document.getElementById("cfdp").checked = selectedNode.cfdp;
         document.getElementById("ams").checked = selectedNode.ams;
@@ -692,7 +694,6 @@ function toggleAddMenu(enable) {
         //console.log(mouseClientX + "and" + mouseClientY);
         document.getElementById("add-menu").style.left = mouseClientX + "px";
         document.getElementById("add-menu").style.top = mouseClientY + "px";
-        //console.log(document.getElementById("add-menu").style.left + "and" + document.getElementById("add-menu").style.top);
     } else {
         if (addMenuState !== 0) {
             addMenuState = 0;
@@ -934,7 +935,6 @@ function saveSearch() {
                 }
             }
         }
-        //console.log("setting value of isIonNodeType to: " + document.getElementById("nodeType").checked);
         selectedNode.ltp = document.getElementById("ltp").checked;
         selectedNode.udp = document.getElementById("udp").checked;
         selectedNode.tcp = document.getElementById("tcp").checked;

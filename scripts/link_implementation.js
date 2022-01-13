@@ -73,7 +73,7 @@ function linkEnd(endNode) {
 }
 
 function drawLine(p1, p2) {
-    var mat = new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 1 });
+    var mat = new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 3.0 });
     var geo = new THREE.Geometry();
     geo.vertices.push(p1, p2);
     var line = new THREE.Line(geo, mat);
@@ -92,7 +92,7 @@ function deleteLine() {
 
 
 function createLink(startNode, endNode) {
-    var mat = new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 1 });
+    var mat = new THREE.LineBasicMaterial({ color: 0xffffff, linewidth: 3.0 });
     var geo = new THREE.Geometry();
     geo.vertices.push(startNode.position, endNode.position);
     var linkMesh = new THREE.Line(geo, mat);
@@ -106,8 +106,8 @@ function createLink(startNode, endNode) {
     return link;
 }
 
-function createHostLink(startHost, endHost, color = "White") {
-    var mat = new THREE.LineBasicMaterial({ color: lookupColor(color), linewidth: 1 });
+function createHostLink(startHost, endHost, color = 0xffffff) {
+    var mat = new THREE.LineBasicMaterial({ color: lookupColor(color), linewidth: 3.0 });
     var geo = new THREE.Geometry();
     geo.vertices.push(startHost.position, endHost.position);
     var linkMesh = new THREE.Line(geo, mat);

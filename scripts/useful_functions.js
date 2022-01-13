@@ -104,7 +104,6 @@ function getObject(mesh) {
             return hostMasterList[i];
         }
     }
-    //console.log("the node class was not found for the mesh");
 }
 
 function getObjectFromLabel(label, hostFirst = false) {
@@ -140,7 +139,6 @@ function getLink(linkMesh) {
             return linkMasterList[i];
         }
     }
-    console.log("the link class was not found for the mesh");
 }
 
 /* This function nodeMenuSave to true so that context_menu_manipulations can know when to save the node */

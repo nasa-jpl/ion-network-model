@@ -239,10 +239,11 @@ function updateNodeLabel(node) {
     if (node.nodeLabel != "") {
         // Generate text title for the node
         var loader = new THREE.FontLoader();
-        loader.load('helvetiker_bold.typeface.json', function (font) {
+        loader.setCrossOrigin('use-credentials');
+        loader.load('http://localhost:8000/helvetiker_bold.typeface.json', function (font) {
             var nodeLabel = new THREE.TextGeometry(node.nodeLabel, {
                 font: font,
-                size: 2,
+                size: 1,
                 height: .2,
                 curveSegments: 12,
                 bevelEnabled: false,
@@ -266,7 +267,7 @@ function updateNodeLabel(node) {
                 bevelSegments: 5
             });
             nodeID.center();
-            var textMaterial = new THREE.MeshBasicMaterial({ color: "rgb(255, 0, 0)" });
+            var textMaterial = new THREE.MeshBasicMaterial({ color: "rgb(0, 204, 255)" });
             var labelMesh = new THREE.Mesh(nodeLabel, textMaterial);
             var nodeIDMesh = new THREE.Mesh(nodeID, textMaterial);
             labelMesh.name = "Label Mesh";
@@ -312,7 +313,7 @@ function updateHostLabel(host) {
         loader.load('helvetiker_bold.typeface.json', function (font) {
             var hostLabel = new THREE.TextGeometry(host.hostLabel, {
                 font: font,
-                size: 2,
+                size: 1,
                 height: .2,
                 curveSegments: 12,
                 bevelEnabled: false,
@@ -322,7 +323,7 @@ function updateHostLabel(host) {
             });
             hostLabel.text = host.hostLabel;
             hostLabel.center();
-            var textMaterial = new THREE.MeshBasicMaterial({ color: "rgb(255, 0, 0)" });
+            var textMaterial = new THREE.MeshBasicMaterial({ color: "rgb(0, 204, 255)" });
             var labelMesh = new THREE.Mesh(hostLabel, textMaterial);
             labelMesh.name = "Label Mesh";
             //Add wireframe to the label
@@ -595,7 +596,6 @@ function onMouseDown(event) {
                 moveModeY = true;
                 // Calculate the offset
                 offset.set(intersect.point.x - intersect.object.position.x, intersect.point.y - intersect.object.position.y, intersect.point.z - intersect.object.position.z);
-                //console.log(offset);
             }
             else if (intersect.object.name == "xArrow") {
                 controls.enabled = false;
