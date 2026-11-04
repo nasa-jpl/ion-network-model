@@ -185,6 +185,24 @@ function generate_cfdprc(prefix, num, basic, adv) {
     return [prefix + num + '.cfdrc', content.join('\n')];
 }
 
+// Order two ipn node identifiers by their fully-qualified node number, the
+// way ION does. An identifier is either "<node>" (2-part) or
+// "<allocator>.<node>" (3-part, allocator defaulting to 0). ION packs this as
+// (allocator << 32) | node, so a plain string/numeric compare is wrong for
+// multi-digit node numbers and for allocator-qualified identifiers. Compare the
+// (allocator, node) pair instead. Returns true when a sorts before b.
+function fqnnLess(a, b) {
+    function key(id) {
+        var s = "" + id;
+        var dot = s.indexOf(".");
+        return dot >= 0
+            ? [Number(s.slice(0, dot)), Number(s.slice(dot + 1))]
+            : [0, Number(s)];
+    }
+    var ka = key(a), kb = key(b);
+    return ka[0] !== kb[0] ? ka[0] < kb[0] : ka[1] < kb[1];
+}
+
 function generate_globalrc(basic, adv) {
     var content = [];
     if (adv['DEFAULT']) {
@@ -193,7 +211,9 @@ function generate_globalrc(basic, adv) {
             var dests = basic['edge_list'][src]
             for (var i = 0; i < dests.length; i++) {
                 var dest = dests[i];
-                if (src < dest[0])
+                // Emit each undirected range once, with the numerically smaller
+                // node first so ION implicitly declares the reverse direction.
+                if (fqnnLess(src, dest[0]))
                     content.push(`a range +0 +345600 ${src} ${dest[0]} 4`);
             }
         }
